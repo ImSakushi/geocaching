@@ -1,0 +1,142 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "API de Géocaching",
+      "version": "1.0.0",
+      "description": "API permettant la gestion des utilisateurs et des geocaches"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:5001",
+        "description": "Serveur local"
+      }
+    ],
+    "paths": {
+      "/api/auth/register": {
+        "post": {
+          "summary": "Inscription d'un nouvel utilisateur",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": { "type": "string" },
+                    "password": { "type": "string" }
+                  },
+                  "required": ["email", "password"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Utilisateur enregistré et token retourné",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "token": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "400": { "description": "Utilisateur déjà existant" },
+            "500": { "description": "Erreur serveur" }
+          }
+        }
+      },
+      "/api/auth/login": {
+        "post": {
+          "summary": "Authentification d'un utilisateur",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": { "type": "string" },
+                    "password": { "type": "string" }
+                  },
+                  "required": ["email", "password"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Token retourné",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "token": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "400": { "description": "Identifiants invalides" },
+            "500": { "description": "Erreur serveur" }
+          }
+        }
+      },
+      "/api/geocache": {
+        "post": {
+          "summary": "Créer une nouvelle geocache",
+          "security": [{ "bearerAuth": [] }],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "gpsCoordinates": {
+                      "type": "object",
+                      "properties": {
+                        "lat": { "type": "number" },
+                        "lng": { "type": "number" }
+                      },
+                      "required": ["lat", "lng"]
+                    },
+                    "difficulty": { "type": "number" },
+                    "description": { "type": "string" }
+                  },
+                  "required": ["gpsCoordinates", "difficulty"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Geocache créée" },
+            "401": { "description": "Token invalide ou absent" },
+            "500": { "description": "Erreur serveur" }
+          }
+        },
+        "get": {
+          "summary": "Récupérer toutes les geocaches",
+          "security": [{ "bearerAuth": [] }],
+          "responses": {
+            "200": { "description": "Liste des geocaches retournée" },
+            "401": { "description": "Token invalide ou absent" },
+            "500": { "description": "Erreur serveur" }
+          }
+        }
+      }
+    },
+    "components": {
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
+    }
+  }
