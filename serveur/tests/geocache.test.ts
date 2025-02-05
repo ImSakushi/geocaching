@@ -1,4 +1,4 @@
-// tests/geocache.test.ts
+
 import request from 'supertest';
 import mongoose from 'mongoose';
 import app from '../server';
@@ -13,13 +13,13 @@ let tokenUser2: string;
 let geocacheId: string;
 
 beforeAll(async () => {
-  // Connexion à la base de données de test
+  
   await mongoose.connect(MONGO_URI_TEST, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   } as mongoose.ConnectOptions);
 
-  // Créer et connecter user1
+  
   await request(app)
     .post('/api/auth/register')
     .send({ email: 'user1@example.com', password: 'password1' });
@@ -28,7 +28,7 @@ beforeAll(async () => {
     .send({ email: 'user1@example.com', password: 'password1' });
   tokenUser1 = res1.body.token;
 
-  // Créer et connecter user2
+  
   await request(app)
     .post('/api/auth/register')
     .send({ email: 'user2@example.com', password: 'password2' });
@@ -61,7 +61,7 @@ describe('Endpoints des géocaches', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body._id).toBeDefined();
     expect(res.body.creator).toBeDefined();
-    // Sauvegarde de l'ID pour d'autres tests
+    
     geocacheId = res.body._id;
   });
 
@@ -108,7 +108,7 @@ describe('Endpoints des géocaches', () => {
   });
 
   test("User2 ne peut PAS supprimer une géocache qui ne lui appartient pas", async () => {
-    // Créer une nouvelle géocache avec user1
+    
     const geocacheData = {
       gpsCoordinates: { lat: 48.8566, lng: 2.3522 },
       difficulty: 2,

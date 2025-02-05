@@ -1,0 +1,279 @@
+openapi: 3.0.0
+info:
+  title: GeoCaching API
+  version: "1.0.0"
+  description: API pour l'application GeoCaching
+
+servers:
+  - url: http://localhost:5001/api
+    description: Serveur local
+
+paths:
+  /auth/register:
+    post:
+      summary: Inscription d'un nouvel utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        '200':
+          description: Inscription réussie, renvoie le token JWT
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Erreur (par exemple, utilisateur déjà existant)
+
+  /auth/login:
+    post:
+      summary: Connexion d'un utilisateur existant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        '200':
+          description: Connexion réussie, renvoie le token JWT
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Identifiants invalides
+
+  /geocache:
+    get:
+      summary: Récupérer toutes les géocaches (filtrable par proximité)
+      parameters:
+        - in: query
+          name: lat
+          schema:
+            type: number
+          description: Latitude de référence
+        - in: query
+          name: lng
+          schema:
+            type: number
+          description: Longitude de référence
+        - in: query
+          name: radius
+          schema:
+            type: number
+          description: Rayon de recherche en km
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des géocaches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Geocache'
+        '401':
+          description: Non autorisé
+
+    post:
+      summary: Créer une nouvelle géocache
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - gpsCoordinates
+                - difficulty
+              properties:
+                gpsCoordinates:
+                  type: object
+                  required:
+                    - lat
+                    - lng
+                  properties:
+                    lat:
+                      type: number
+                      example: 48.8566
+                    lng:
+                      type: number
+                      example: 2.3522
+                difficulty:
+                  type: number
+                  example: 3
+                description:
+                  type: string
+                  example: "Cache dans le centre de Paris"
+      responses:
+        '200':
+          description: Géocache créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geocache'
+        '401':
+          description: Non autorisé
+
+  /geocache/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    put:
+      summary: Modifier une géocache (uniquement par le créateur)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - gpsCoordinates
+                - difficulty
+              properties:
+                gpsCoordinates:
+                  type: object
+                  required:
+                    - lat
+                    - lng
+                  properties:
+                    lat:
+                      type: number
+                    lng:
+                      type: number
+                difficulty:
+                  type: number
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Géocache mise à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geocache'
+        '401':
+          description: Non autorisé (l'utilisateur n'est pas le créateur)
+        '404':
+          description: Géocache non trouvée
+    delete:
+      summary: Supprimer une géocache (uniquement par le créateur)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Géocache supprimée
+        '401':
+          description: Non autorisé
+        '404':
+          description: Géocache non trouvée
+
+  /geocache/{id}/comment:
+    post:
+      summary: Ajouter un commentaire à une géocache
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  example: "Très belle cache !"
+      responses:
+        '200':
+          description: Commentaire ajouté avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geocache'
+        '404':
+          description: Géocache non trouvée
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Geocache:
+      type: object
+      properties:
+        _id:
+          type: string
+        gpsCoordinates:
+          type: object
+          properties:
+            lat:
+              type: number
+            lng:
+              type: number
+        creator:
+          type: string
+          description: Identifiant de l'utilisateur créateur (habituellement l'ID)
+        difficulty:
+          type: number
+        description:
+          type: string
+        comments:
+          type: array
+          items:
+            type: object
+            properties:
+              user:
+                type: string
+              text:
+                type: string
+              date:
+                type: string
+                format: date-time

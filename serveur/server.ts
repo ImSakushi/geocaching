@@ -1,14 +1,17 @@
 // server.ts
 import express from 'express';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db';
 import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from './doc/swagger.json';
-import { errorHandler } from './middleware/errorHandler';
+import fs from 'fs';
+import yaml from 'js-yaml';
 
 dotenv.config();
 
+// Charger le document Swagger depuis le fichier
+const swaggerDocument = yaml.load(fs.readFileSync('./doc/swagger.yaml', 'utf8')) as Record<string, unknown>;
 // Se connecter à la DB seulement si on n'est pas en mode test
 if (process.env.NODE_ENV !== 'test') {
   connectDB();
@@ -18,8 +21,7 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 // Documentation Swagger sur /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -30,9 +32,6 @@ import geocacheRoutes from './routes/geocache';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/geocache', geocacheRoutes);
-
-// Middleware de gestion des erreurs (doit être placé après les routes)
-app.use(errorHandler);
 
 // Démarrage du serveur uniquement si ce fichier est exécuté directement
 if (require.main === module) {

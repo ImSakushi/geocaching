@@ -12,13 +12,6 @@
       "types": ["node", "jest"],
       "resolveJsonModule": true
     },
-    "include": [
-      "server.ts",
-      "config/**/*.ts",
-      "middleware/**/*.ts",
-      "models/**/*.ts",
-      "routes/**/*.ts",
-      "seed.ts",
-      "tests/**/*.ts"
-    ]
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules"]
   }
