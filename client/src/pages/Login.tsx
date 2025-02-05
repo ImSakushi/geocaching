@@ -14,6 +14,7 @@ const Login: React.FC = () => {
     try {
       const res = await API.post('/auth/login', { email, password });
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('userEmail', email);
       navigate('/');
     } catch (err: any) {
       console.error(err);
@@ -27,7 +28,7 @@ const Login: React.FC = () => {
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleLogin}>
         <div>
-          <label>Email :</label>
+          <label>Email : </label>
           <input
             type="email"
             value={email}
@@ -36,7 +37,7 @@ const Login: React.FC = () => {
           />
         </div>
         <div>
-          <label>Mot de passe :</label>
+          <label>Mot de passe : </label>
           <input
             type="password"
             value={password}

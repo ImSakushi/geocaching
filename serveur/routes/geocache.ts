@@ -56,7 +56,7 @@ router.get(
       const longitude = parseFloat(lng as string);
       const rad = parseFloat(radius as string); // en km
 
-      // Récupère toutes les géocaches puis filtre en JS
+      // Pour de grandes quantités de données, envisagez d'utiliser un index 2dsphere et les opérateurs MongoDB géospatiaux ($near, $geoWithin, etc.)
       const allCaches = await Geocache.find().populate('creator', 'email');
       caches = allCaches.filter((cache: any) => {
         const { lat: cacheLat, lng: cacheLng } = cache.gpsCoordinates;

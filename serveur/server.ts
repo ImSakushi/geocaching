@@ -1,11 +1,11 @@
 // server.ts
 import express from 'express';
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './doc/swagger.json';
+import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
 
@@ -18,7 +18,8 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Documentation Swagger sur /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -29,6 +30,9 @@ import geocacheRoutes from './routes/geocache';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/geocache', geocacheRoutes);
+
+// Middleware de gestion des erreurs (doit être placé après les routes)
+app.use(errorHandler);
 
 // Démarrage du serveur uniquement si ce fichier est exécuté directement
 if (require.main === module) {

@@ -1,9 +1,7 @@
 // middleware/auth.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { JWT_SECRET } from '../config/auth';
 
 interface AuthRequest extends Request {
   user?: any;
@@ -20,8 +18,8 @@ const auth = (req: AuthRequest, res: Response, next: NextFunction) => {
   const token = authHeader.split(' ')[1];
   
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as any;
-    req.user = decoded.user; // on met en place l'ID utilisateur par exemple
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    req.user = decoded.user; // Assurez-vous que le payload est bien formé
     next();
   } catch (err) {
     res.status(401).json({ msg: 'Token invalide' });

@@ -1,11 +1,9 @@
 // routes/auth.ts
 import { Router, Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 import User from '../models/User';
 import { asyncHandler } from '../middleware/asynchandler';
-
-dotenv.config();
+import { JWT_SECRET, JWT_EXPIRES_IN } from '../config/auth';
 
 const router = Router();
 
@@ -27,7 +25,7 @@ router.post(
     
     // Génère le token
     const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: process.env.JWT_EXPIRES_IN });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
     
     res.json({ token });
   })
@@ -55,7 +53,7 @@ router.post(
     
     // Génère le token
     const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: process.env.JWT_EXPIRES_IN });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
     
     res.json({ token });
   })

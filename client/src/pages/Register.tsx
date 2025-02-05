@@ -27,7 +27,7 @@ const Register: React.FC = () => {
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleRegister}>
         <div>
-          <label>Email :</label>
+          <label>Email : </label>
           <input
             type="email"
             value={email}
@@ -36,7 +36,7 @@ const Register: React.FC = () => {
           />
         </div>
         <div>
-          <label>Mot de passe :</label>
+          <label>Mot de passe : </label>
           <input
             type="password"
             value={password}
