@@ -8,7 +8,7 @@ import { jwtDecode } from 'jwt-decode'; // Assurez-vous d'importer jwt-decode
 import LikeButton from '../components/LikeButton';
 
 
-// Interface pour décoder le token JWT
+// interface pr décoder le token jwt
 interface DecodedToken {
   user: {
     id: string;
@@ -18,51 +18,51 @@ interface DecodedToken {
   iat: number;
 }
 
-// Interfaces locales pour le Dashboard avec les likes sous forme de string[]
+// interfaces du dashboard, likes en string[]
 export interface DashboardComment {
   _id: string;
   user: { email: string; avatar?: string } | undefined;
   text: string;
   date: string;
-  likes: string[]; // tableau d'ID utilisateur
+  likes: string[]; 
 }
 
 export interface DashboardGeocache extends Omit<BaseGeocache, 'likes' | 'comments'> {
   difficulty: number;
   creator: { email: string; _id: string };
   comments: DashboardComment[];
-  likes: string[]; // tableau d'ID
+  likes: string[]; 
   foundBy: string[];
   photos: string[];
-  password?: string; // <-- Nouveau champ pour le mot de passe (optionnel)
+  password?: string; 
 }
 
 const Dashboard: React.FC = () => {
   const [geocaches, setGeocaches] = useState<DashboardGeocache[]>([]);
   const [error, setError] = useState('');
 
-  // États pour l'ajout d'une nouvelle géocache
+  // états pr ajout de cache
   const [newPos, setNewPos] = useState<{ lat: number; lng: number } | null>(null);
   const [newDescription, setNewDescription] = useState('');
   const [newDifficulty, setNewDifficulty] = useState<number>(1);
   const [newPhoto, setNewPhoto] = useState<File | null>(null);
-  const [newCachePassword, setNewCachePassword] = useState(''); // <-- État pour le mdp de la géocache
+  const [newCachePassword, setNewCachePassword] = useState(''); 
 
-  // États pour la modification d'une géocache existante
+  // états pr modif d'une cache
   const [editCache, setEditCache] = useState<DashboardGeocache | null>(null);
   const [editDescription, setEditDescription] = useState('');
   const [editDifficulty, setEditDifficulty] = useState<number>(1);
 
-  // État pour stocker le contenu des nouveaux commentaires pour chaque géocache
+  // stocke le contenu des nouveaux coms pr chaque cache
   const [newComments, setNewComments] = useState<{ [key: string]: string }>({});
 
-  // État pour la géocache sélectionnée (pour afficher ses commentaires dans une modale)
+  // cache sélectionnée (affichage coms en modale) 
   const [selectedCache, setSelectedCache] = useState<DashboardGeocache | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  // Nouvel état pour le rayon de recherche en km
+  // état pr le rayon de recherche en km
   const [radius, setRadius] = useState<number>(50);
 
-  // État pour l'édition d'un commentaire (admin ou auteur)
+  // édition d'un com (admin ou auteur)
   const [editComment, setEditComment] = useState<{ cacheId: string, commentId: string, text: string } | null>(null);
 
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
   const currentUserEmail = Cookies.get('userEmail');
   const currentUserId = Cookies.get('userId');
 
-  // Décodage du token pour obtenir isAdmin
+  // décodage du token pour obtenir isAdmin
   let isAdmin = false;
   if (token) {
     try {
@@ -82,13 +82,13 @@ const Dashboard: React.FC = () => {
   }
 
   useEffect(() => {
-    // Si pas de token ou d'informations, redirige vers login
+    // si pas de token ou d'infos, redirige vers login
     if (!token || !currentUserEmail || !currentUserId) {
       navigate('/login');
     }
   }, [token, currentUserEmail, currentUserId, navigate]);
 
-  // Récupération des géocaches à chaque changement de userLocation ou de radius
+  // récupère les caches qd userLocation ou radius change
   useEffect(() => {
     fetchGeocaches();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,7 +142,7 @@ const Dashboard: React.FC = () => {
         password: newCachePassword // <-- Envoi du mdp (optionnel)
       };
       const res = await API.post('/geocache', payload);
-      // Si une photo a été sélectionnée, uploader la photo
+      // si une photo sélectionnée, on upload
       if (newPhoto && res.data._id) {
         const formData = new FormData();
         formData.append('photo', newPhoto);
@@ -154,7 +154,7 @@ const Dashboard: React.FC = () => {
       setNewDescription('');
       setNewDifficulty(1);
       setNewPhoto(null);
-      setNewCachePassword(''); // Réinitialise le mot de passe
+      setNewCachePassword(''); // reset mdp
       fetchGeocaches();
     } catch (err: any) {
       console.error(err);
@@ -242,10 +242,10 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // Modification de la fonction de validation ("Trouvé")
+  // validation "trouvé"
   const handleFoundCache = async (cache: BaseGeocache) => {
     let passwordInput = '';
-    // Si la géocache est protégée par un mot de passe, on demande à l'utilisateur de le saisir
+    // si cache protégée par mdp, on demande à l'user
     if ((cache as DashboardGeocache).password) {
       passwordInput = window.prompt("Entrez le mot de passe de la géocache:") || '';
       if (!passwordInput) return; // annulation si aucun mot de passe n'est saisi
@@ -259,7 +259,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // Fonctions pour l'édition et la suppression des commentaires (accessible pour l'auteur ou l'admin)
+  // edit / delete coms (admin ou auteur)
   const openEditCommentModal = (cacheId: string, commentId: string, currentText: string) => {
     setEditComment({ cacheId, commentId, text: currentText });
   };
@@ -367,7 +367,6 @@ const Dashboard: React.FC = () => {
       </header>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Slider pour ajuster le rayon de recherche */}
       <div style={{ marginBottom: '20px' }}>
         <label htmlFor="radiusSlider">Rayon de recherche : {radius} km</label>
         <input
@@ -523,7 +522,6 @@ const Dashboard: React.FC = () => {
                         <p>{comment.text}</p>
                         <small>{new Date(comment.date).toLocaleString()}</small>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                          {/* Remplacement de l'icône like par le composant LikeButton */}
                           <LikeButton
                             liked={commentHasLiked}
                             onClick={() => handleLikeComment(selectedCache._id, comment._id)}

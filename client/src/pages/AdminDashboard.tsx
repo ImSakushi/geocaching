@@ -16,7 +16,7 @@ const AdminDashboard: React.FC = () => {
   const [newPassword, setNewPassword] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
 
-  // Fonction pour éjecter l'utilisateur non-admin
+  // éjecter un user non-admin
   const ejectUser = () => {
     alert("Accès refusé. Vous n'êtes pas administrateur.");
     Cookies.remove('token');
@@ -25,7 +25,7 @@ const AdminDashboard: React.FC = () => {
     navigate('/login');
   };
 
-  // Chargement de la liste des utilisateurs
+  // charge la liste des users
   const fetchUsers = () => {
     API.get('/admin/users')
       .then((res) => setUsers(res.data))
@@ -63,7 +63,7 @@ const AdminDashboard: React.FC = () => {
       .catch(() => setError("Erreur lors de la mise à jour du mot de passe"));
   };
 
-  // Nouvelle fonction pour basculer le statut admin
+  // toggle admin status
   const handleToggleAdmin = (userId: string, currentStatus: boolean) => {
     API.put(`/admin/users/${userId}/admin`, { isAdmin: !currentStatus })
       .then(() => {
@@ -94,7 +94,6 @@ const AdminDashboard: React.FC = () => {
               <td>{user.email}</td>
               <td>{user.isAdmin ? 'Oui' : 'Non'}</td>
               <td>
-                {/* Bouton pour basculer le statut admin */}
                 <button
                   onClick={() => handleToggleAdmin(user._id, user.isAdmin)}
                   style={{ backgroundColor: user.isAdmin ? '#3498db' : '#95a5a6', color: '#fff', padding: '5px 10px', border: 'none', borderRadius: '4px' }}

@@ -8,7 +8,7 @@ const markerIcon2x = require('leaflet/dist/images/marker-icon-2x.png');
 const markerIconUrl = require('leaflet/dist/images/marker-icon.png');
 const markerShadow = require('leaflet/dist/images/marker-shadow.png');
 
-// Création d'une instance d'icône par défaut
+// icône par défaut
 const defaultIcon = new L.Icon({
   iconRetinaUrl: markerIcon2x,
   iconUrl: markerIconUrl,
@@ -19,7 +19,7 @@ const defaultIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Définition d'une icône verte pour les géocaches trouvées
+// icône verte pr les caches trouvées
 const greenIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
   iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -30,7 +30,7 @@ const greenIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Définition des interfaces pour les commentaires et les géocaches
+// interfaces pr commentaires & caches
 export interface Comment {
   _id?: string;
   user?: { email: string };
@@ -56,7 +56,7 @@ interface MapProps {
   onFound: (cache: Geocache) => void;
 }
 
-// Composant pour gérer les clics sur la carte
+// gestion des clics sur la carte
 const MapClickHandler: React.FC<{ onMapClick: (lat: number, lng: number) => void }> = ({ onMapClick }) => {
   useMapEvents({
     click(e) {
@@ -76,7 +76,7 @@ const MapComponent: React.FC<MapProps> = ({ geocaches, onMapClick, onMarkerClick
       />
       <MapClickHandler onMapClick={onMapClick} />
       {geocaches.map((cache) => {
-        // Utilise l'icône verte si la géocache a été trouvée
+        // icône verte si cache trouvée
         const markerIcon = (cache.foundBy && cache.foundBy.length > 0) ? greenIcon : defaultIcon;
         return (
           <Marker key={cache._id} position={[cache.gpsCoordinates.lat, cache.gpsCoordinates.lng]} icon={markerIcon}>

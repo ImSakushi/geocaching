@@ -15,7 +15,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       const res = await API.post('/auth/login', { email, password });
-      // Stocker le token et éventuellement l'email dans des cookies
+      // stocke token & mail dans cookies
       Cookies.set('token', res.data.token, { expires: 1 });
       Cookies.set('userEmail', email, { expires: 1 });
       Cookies.set('userId', res.data.userId, { expires: 1 });
