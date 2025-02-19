@@ -11,11 +11,9 @@ const seedData = async () => {
   try {
     await connectDB();
 
-    // Supprimer les anciennes données
     await User.deleteMany();
     await Geocache.deleteMany();
 
-    // Créer quelques utilisateurs
     const user1 = new User({ email: 'matthias.casanova@mmibordeaux.com', password: 'password1' });
     const user2 = new User({ email: 'hugo.gitton@mmibordeaux.com', password: 'password2' });
     const user3 = new User({ email: 'nino.lefort@mmibordeaux.com', password: 'password3' });
@@ -23,7 +21,6 @@ const seedData = async () => {
     await user2.save();
     await user3.save();
 
-    // Liste d'exemples de géocaches
     interface CacheSeed {
       city: string;
       gpsCoordinates: { lat: number; lng: number };

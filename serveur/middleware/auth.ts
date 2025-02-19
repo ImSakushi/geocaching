@@ -8,7 +8,7 @@ interface AuthRequest extends Request {
 }
 
 const auth = (req: AuthRequest, res: Response, next: NextFunction) => {
-  // Le token doit être dans le header "Bearer <token>"
+  // token doit être dans "Bearer <token>"
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

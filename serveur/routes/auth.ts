@@ -7,13 +7,13 @@ import { JWT_SECRET, JWT_EXPIRES_IN } from '../config/auth';
 
 const router = Router();
 
-// Route d'inscription
+// route d'inscription
 router.post(
   '/register',
   asyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email, password } = req.body;
     
-    // Vérifie si l'utilisateur existe déjà
+    // check si user existe déjà
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       res.status(401).json({ msg: 'Utilisateur déjà existant' });
@@ -23,16 +23,16 @@ router.post(
     const user = new User({ email, password });
     await user.save();
     
-    // Génère le token
+    // génère token
     const payload = { user: { id: user._id, isAdmin: user.isAdmin } };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
     
-    // Retourne le token, l'id et l'avatar
+    // retourne token, id & avatar
     res.status(201).json({ token, userId: user._id, avatar: user.avatar });
   })
 );
 
-// Route de connexion
+// route de connexion
 router.post(
   '/login',
   asyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -50,11 +50,11 @@ router.post(
       return;
     }
     
-    // Inclure isAdmin dans le payload
+    // ajoute isAdmin au payload
     const payload = { user: { id: user._id, isAdmin: user.isAdmin } };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
     
-    // Retourne le token, l'id et l'avatar
+    // retourne token, id & avatar
     res.status(201).json({ token, userId: user._id, avatar: user.avatar });
   })
 );

@@ -7,7 +7,7 @@ import User from '../models/User';
 
 const router = Router();
 
-// Classement : Meilleurs clients (ceux qui ont trouvé le plus de caches)
+// classement : meilleurs finders
 router.get('/best-customers', auth, asyncHandler(async (req: Request, res: Response) => {
   const results = await Geocache.aggregate([
     { $unwind: "$foundBy" },
@@ -15,7 +15,7 @@ router.get('/best-customers', auth, asyncHandler(async (req: Request, res: Respo
     { $sort: { finds: -1 } },
     { $limit: 10 }
   ]);
-  // Récupérer les infos utilisateur
+  // récupère infos user
   const users = await User.find({ _id: { $in: results.map(r => r._id) } }, { password: 0 });
   const rankings = results.map(result => {
     const user = users.find(u => u._id.toString() === result._id.toString());
@@ -27,7 +27,7 @@ router.get('/best-customers', auth, asyncHandler(async (req: Request, res: Respo
   res.json(rankings);
 }));
 
-// Classement : Caches les plus populaires (par nombre de likes)
+// classement : caches + populaires
 router.get('/popular-caches', auth, asyncHandler(async (req: Request, res: Response) => {
     const caches = await Geocache.aggregate([
       { 
@@ -45,7 +45,7 @@ router.get('/popular-caches', auth, asyncHandler(async (req: Request, res: Respo
     res.json(caches);
   }));
 
-// Classement : Caches les moins trouvées (par nombre de fois trouvées)
+// classement : caches - trouvées
 router.get('/rarely-found-caches', auth, asyncHandler(async (req: Request, res: Response) => {
     const caches = await Geocache.aggregate([
       { 

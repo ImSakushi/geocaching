@@ -39,7 +39,7 @@ describe("Routes d'authentification", () => {
   });
 
   test("Connexion d'un utilisateur existant", async () => {
-    // On regarde si l'user existe déjà
+    // check si user existe déjà
     const user = await User.findOne({ email: userData.email });
     expect(user).toBeDefined();
     

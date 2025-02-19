@@ -7,7 +7,7 @@ import auth from '../middleware/auth';
 
 const router = Router();
 
-// Middleware pour vérifier que l'utilisateur est admin
+// check si user est admin
 const adminAuth = (req: Request & { user?: any }, res: Response, next: NextFunction) => {
     if (!req.user || !req.user.isAdmin) {
       return res.status(403).json({ msg: "Accès refusé : administrateur uniquement" });
@@ -15,16 +15,16 @@ const adminAuth = (req: Request & { user?: any }, res: Response, next: NextFunct
     next();
   };
 
-// Toutes les routes de ce routeur nécessitent l'authentification et être admin
+// toutes les routes ici req auth + admin
 router.use(auth, adminAuth);
 
-// Récupérer la liste de tous les utilisateurs (sans le mot de passe)
+// récupère liste users (sans mdp)
 router.get('/users', asyncHandler(async (req: Request, res: Response) => {
   const users = await User.find({}, { password: 0 });
   res.json(users);
 }));
 
-// Mettre à jour le mot de passe d'un utilisateur
+// update mdp user
 router.put('/users/:id', asyncHandler(async (req: Request, res: Response) => {
   const { newPassword } = req.body;
   if (!newPassword) {
@@ -41,7 +41,7 @@ router.put('/users/:id', asyncHandler(async (req: Request, res: Response) => {
   res.json({ msg: "Mot de passe mis à jour avec succès" });
 }));
 
-// Supprimer un utilisateur
+// supprime un user
 router.delete('/users/:id', asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findByIdAndDelete(req.params.id);
   if (!user) {

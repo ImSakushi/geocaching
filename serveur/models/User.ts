@@ -26,14 +26,14 @@ const UserSchema: Schema = new Schema({
     type: Boolean,
     default: false
   },
-  // Nouveau champ pour l'avatar
+  // nouveau champ avatar
   avatar: {
     type: String,
     default: ''
   }
 });
 
-// Avant de sauvegarder, on hash le mot de passe
+// hash mdp avant save
 UserSchema.pre<IUser>('save', async function (next) {
   if (!this.isModified('password')) return next();
   
@@ -46,7 +46,7 @@ UserSchema.pre<IUser>('save', async function (next) {
   }
 });
 
-// Comparer le mot de passe fourni avec le hash stocké
+// compare mdp avec hash
 UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
   return await bcrypt.compare(candidatePassword, this.password);
 };

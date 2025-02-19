@@ -10,15 +10,15 @@ import fs from 'fs';
 
 const router = Router();
 
-// Détermine le chemin absolu du dossier uploads (ici, on le place à la racine du projet)
+// définit chemin pr uploads (racine projet)
 const uploadDir = path.join(__dirname, '../../uploads');
 
-// Vérifie si le dossier existe, sinon le crée
+// check si dossier existe, sinon crée
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configuration de Multer pour enregistrer les fichiers dans le dossier uploads
+// config multer pr save fichiers dans uploads
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, uploadDir);
@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Mettre à jour l'avatar d'un utilisateur
+// update avatar user
 router.put('/avatar', auth, upload.single('avatar'), asyncHandler(async (req: Request, res: Response) => {
   if (!req.file) {
     return res.status(400).json({ msg: "Aucun fichier envoyé" });
@@ -42,7 +42,7 @@ router.put('/avatar', auth, upload.single('avatar'), asyncHandler(async (req: Re
   res.json({ msg: "Avatar mis à jour", avatar: user?.avatar });
 }));
 
-// Ajouter une photo à une géocache
+// ajoute photo à une cache
 router.post('/geocache/:id/photo', auth, upload.single('photo'), asyncHandler(async (req: Request, res: Response) => {
   if (!req.file) {
     return res.status(400).json({ msg: "Aucun fichier envoyé" });

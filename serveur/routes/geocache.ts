@@ -27,7 +27,7 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
   return R * c;
 }
 
-// Créer une nouvelle géocache (on accepte en plus un champ "password")
+// créer une cache (champ mdp en plus)
 router.post(
   '/',
   auth,
@@ -37,7 +37,7 @@ router.post(
       gpsCoordinates,
       difficulty,
       description,
-      password: password || '', // enregistre le mdp s’il est fourni, sinon chaîne vide
+      password: password || '', 
       creator: req.user.id,
       likes: [],
       comments: []
@@ -47,7 +47,7 @@ router.post(
   })
 );
 
-// Récupérer les géocaches (filtrage par proximité si lat, lng et radius sont fournis)
+// récupère les caches (filtre par prox si lat/lng/radius donnés)
 router.get(
   '/',
   auth,
@@ -77,8 +77,7 @@ router.get(
   })
 );
 
-// Route pour marquer une géocache comme trouvée
-// Si la géocache possède un mot de passe, on vérifie qu’il correspond
+// si cache a un mdp, check si ok
 router.post(
   '/:id/found',
   auth,
@@ -88,11 +87,11 @@ router.post(
     if (!cache) {
       return res.status(404).json({ msg: 'Géocache non trouvée' });
     }
-    // Si la géocache est protégée par un mot de passe, vérifier le mot de passe fourni
+    // vérif mdp si cache protégée
     if (cache.password && cache.password !== req.body.password) {
       return res.status(401).json({ msg: 'Mot de passe incorrect' });
     }
-    // On ajoute l'ID de l'utilisateur s'il n'est pas déjà présent
+    // ajoute id user si pas déjà là
     if (!cache.foundBy.map((id: any) => id.toString()).includes(userId)) {
       cache.foundBy.push(new mongoose.Types.ObjectId(userId));
       await cache.save();
@@ -101,7 +100,7 @@ router.post(
   })
 );
 
-// Modifier une géocache (uniquement par le créateur)
+// modifier une cache (créateur only)
 router.put(
   '/:id',
   auth,
@@ -122,7 +121,7 @@ router.put(
   })
 );
 
-// Supprimer une géocache (uniquement par le créateur)
+// supprimer une cache (créateur only)
 router.delete(
   '/:id',
   auth,
@@ -141,7 +140,7 @@ router.delete(
   })
 );
 
-// Ajouter un commentaire à une géocache
+// ajouter un com
 router.post(
   '/:id/comment',
   auth,
@@ -164,7 +163,7 @@ router.post(
   })
 );
 
-// Liker/déliker une géocache
+// liker/déliker une cache
 router.post(
   '/:id/like',
   auth,
@@ -189,7 +188,7 @@ router.post(
   })
 );
 
-// Liker/déliker un commentaire
+// liker/déliker un com
 router.post(
   '/:id/comment/:commentId/like',
   auth,
@@ -214,7 +213,7 @@ router.post(
   })
 );
 
-// Modifier un commentaire (seul admin ou l'auteur peut le faire)
+// modifier un com (admin/auteur)
 router.put(
   '/:id/comment/:commentId',
   auth,
@@ -238,7 +237,7 @@ router.put(
   })
 );
 
-// Supprimer un commentaire (seul admin ou l'auteur peut le faire)
+// supprimer un com (admin/auteur)
 router.delete(
   '/:id/comment/:commentId',
   auth,
