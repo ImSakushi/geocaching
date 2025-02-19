@@ -1,13 +1,14 @@
-// src/api.ts
+// client/src/api.ts
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5001/api', // adapte l'URL si nécessaire
+  baseURL: 'http://localhost:5001/api', 
 });
 
-// Intercepteur pour ajouter le token JWT aux requêtes
+// Utilisation d’un intercepteur pour ajouter le token présent dans le cookie aux requêtes
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = Cookies.get('token'); 
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }

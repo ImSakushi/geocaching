@@ -30,6 +30,7 @@ const seedData = async () => {
       difficulty: number;
       description: string;
       creator: mongoose.Types.ObjectId;
+      password?: string; // Nouveau champ optionnel pour le mot de passe
     }
 
     const caches: CacheSeed[] = [
@@ -39,6 +40,7 @@ const seedData = async () => {
         difficulty: 3,
         description: 'Cache dans le centre de Paris',
         creator: user1._id,
+        password: 'secret123' // Protégée par un mot de passe
       },
       {
         city: 'Toulouse',
@@ -46,6 +48,7 @@ const seedData = async () => {
         difficulty: 2,
         description: 'Cache à Toulouse',
         creator: user2._id,
+        password: '' // Pas de mot de passe
       },
       {
         city: 'Lyon',
@@ -53,6 +56,7 @@ const seedData = async () => {
         difficulty: 4,
         description: 'Cache près du vieux Lyon',
         creator: user1._id,
+        password: 'passLyon'
       },
       {
         city: 'Marseille',
@@ -60,6 +64,7 @@ const seedData = async () => {
         difficulty: 3,
         description: 'Cache dans le Vieux-Port de Marseille',
         creator: user3._id,
+        password: ''
       },
       {
         city: 'Nice',
@@ -67,6 +72,7 @@ const seedData = async () => {
         difficulty: 2,
         description: 'Cache sur la Promenade des Anglais',
         creator: user2._id,
+        password: 'nice2025'
       },
       {
         city: 'Bordeaux',
@@ -74,6 +80,7 @@ const seedData = async () => {
         difficulty: 4,
         description: 'Cache au cœur de Bordeaux',
         creator: user1._id,
+        password: ''
       },
       {
         city: 'Nantes',
@@ -81,6 +88,7 @@ const seedData = async () => {
         difficulty: 3,
         description: 'Cache dans les rues de Nantes',
         creator: user3._id,
+        password: 'nantes!'
       },
       {
         city: 'Strasbourg',
@@ -88,6 +96,7 @@ const seedData = async () => {
         difficulty: 4,
         description: 'Cache près de la cathédrale de Strasbourg',
         creator: user2._id,
+        password: ''
       },
       {
         city: 'Montpellier',
@@ -95,6 +104,7 @@ const seedData = async () => {
         difficulty: 2,
         description: 'Cache dans Montpellier centre-ville',
         creator: user1._id,
+        password: ''
       },
       {
         city: 'Rennes',
@@ -102,6 +112,7 @@ const seedData = async () => {
         difficulty: 3,
         description: 'Cache dans le centre historique de Rennes',
         creator: user3._id,
+        password: 'rennes123'
       },
       {
         city: 'Reims',
@@ -109,6 +120,7 @@ const seedData = async () => {
         difficulty: 2,
         description: 'Cache dans Reims, ville du champagne',
         creator: user2._id,
+        password: ''
       },
       {
         city: 'Le Havre',
@@ -116,6 +128,7 @@ const seedData = async () => {
         difficulty: 3,
         description: 'Cache avec vue sur la mer à Le Havre',
         creator: user1._id,
+        password: 'havre2025'
       },
       {
         city: 'Saint-Étienne',
@@ -123,6 +136,7 @@ const seedData = async () => {
         difficulty: 4,
         description: 'Cache dans la région industrielle de Saint-Étienne',
         creator: user3._id,
+        password: ''
       },
       {
         city: 'Grenoble',
@@ -130,6 +144,7 @@ const seedData = async () => {
         difficulty: 3,
         description: 'Cache au pied des montagnes à Grenoble',
         creator: user2._id,
+        password: 'grenoble'
       },
       {
         city: 'Dijon',
@@ -137,6 +152,7 @@ const seedData = async () => {
         difficulty: 2,
         description: 'Cache dans le centre historique de Dijon',
         creator: user1._id,
+        password: ''
       },
       {
         city: 'Limoges',
@@ -144,6 +160,7 @@ const seedData = async () => {
         difficulty: 3,
         description: 'Cache dans la région de la porcelaine à Limoges',
         creator: user3._id,
+        password: 'limoges!'
       },
     ];
 

@@ -34,12 +34,12 @@ describe("Routes d'authentification", () => {
       .post('/api/auth/register')
       .send(userData);
       
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(201);
     expect(res.body.token).toBeDefined();
   });
 
   test("Connexion d'un utilisateur existant", async () => {
-    // On s'assure que l'utilisateur existe déjà
+    // On regarde si l'user existe déjà
     const user = await User.findOne({ email: userData.email });
     expect(user).toBeDefined();
     
@@ -47,7 +47,7 @@ describe("Routes d'authentification", () => {
       .post('/api/auth/login')
       .send(userData);
       
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(201);
     expect(res.body.token).toBeDefined();
   });
 
@@ -56,7 +56,7 @@ describe("Routes d'authentification", () => {
       .post('/api/auth/login')
       .send({ email: 'test@example.com', password: 'mauvaisMotDePasse' });
       
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(401);
     expect(res.body.msg).toBe('Identifiants invalides');
   });
 });

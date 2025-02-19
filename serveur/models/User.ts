@@ -1,10 +1,12 @@
-// models/User.ts
+// serveur/models/User.ts
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
   email: string;
   password: string;
+  isAdmin: boolean;
+  avatar?: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -19,6 +21,15 @@ const UserSchema: Schema = new Schema({
   password: {
     type: String,
     required: true
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
+  // Nouveau champ pour l'avatar
+  avatar: {
+    type: String,
+    default: ''
   }
 });
 

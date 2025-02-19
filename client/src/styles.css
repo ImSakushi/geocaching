@@ -1,144 +1,304 @@
-/* --- Global --- */
+@font-face {
+  font-family: 'OpenAISans';
+  src: url('./fonts/OpenAISans-Regular.8e5ce1c0.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenAISans';
+  src: url('./fonts/OpenAISans-Bold.44b309c3.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenAISans';
+  src: url('./fonts/OpenAISans-Light.bc94c16a.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenAISans';
+  src: url('./fonts/OpenAISans-Medium.75b57261.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenAISans';
+  src: url('./fonts/OpenAISans-RegularItalic.be54cbd4.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'OpenAISans';
+  src: url('./fonts/OpenAISans-Semibold.63de4196.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Variables de design */
+:root {
+  --primary-color: #007bff;
+  --primary-hover: #0056b3;
+  --secondary-color: #6c757d;
+  --accent-color: #17a2b8;
+  --background-color: #ffffff;
+  --surface-color: #f8f9fa;
+  --text-color: #333333;
+  --border-color: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --modal-overlay-bg: rgba(0, 0, 0, 0.5);
+  --transition-speed: 0.3s;
+}
+
+/* Réinitialisation */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Styles globaux */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    background-color: #f5f7fa;
-    color: #333;
+  font-family: 'OpenAISans', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* Liens */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color var(--transition-speed);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* Header */
+header {
+  background-color: var(--surface-color);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+header h2 {
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+/* Boutons */
+button {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  font-family: 'OpenAISans', sans-serif;
+  transition: background-color var(--transition-speed), transform 0.2s;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Formulaires */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+input,
+textarea,
+select {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color var(--transition-speed);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* Conteneur principal */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+}
+
+/* Conteneur de la carte */
+.map-container {
+  height: 400px;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  margin-bottom: 2rem;
+}
+
+/* Listes et éléments */
+ul,
+ol {
+  list-style: none;
+}
+
+.geocache-list li {
+  background-color: var(--surface-color);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px var(--shadow-color);
+  transition: transform 0.2s;
+}
+
+.geocache-list li:hover {
+  transform: translateY(-2px);
+}
+
+.geocache-list {
+  width: 41rem;            /* Largeur fixe, à adapter selon vos besoins */
+  max-height: 600px;       /* Hauteur maximale pour éviter qu'elle ne s'étende trop */
+  overflow-y: auto;        /* Ajoute une barre de défilement verticale si nécessaire */
+  margin: 0 auto;          /* Centre la liste horizontalement */
+}
+
+
+/* Tableaux */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+table th,
+table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+table th {
+  background-color: var(--surface-color);
+}
+
+/* Modales */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--modal-overlay-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal {
+  background-color: var(--background-color);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 16px var(--shadow-color);
+  max-width: 500px;
+  width: 100%;
+  animation: slideIn 0.4s ease-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  a {
-    color: #3498db;
-    text-decoration: none;
-    transition: color 0.3s;
+  to {
+    opacity: 1;
   }
-  a:hover {
-    color: #2980b9;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
   }
-  
-  /* --- Header --- */
-  header {
-    background-color: #fff;
-    padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  header h2 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-  
-  /* --- Boutons --- */
-  button {
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-  }
-  button:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-  }
-  button:active {
+  to {
     transform: translateY(0);
+    opacity: 1;
   }
-  
-  /* --- Formulaires --- */
-  form {
-    display: flex;
+}
+
+/* Images et avatars */
+img {
+  max-width: 100%;
+  display: block;
+  border-radius: 0.5rem;
+}
+
+
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Classes utilitaires */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.mb-1 {
+  margin-bottom: 1rem;
+}
+
+.p-1 {
+  padding: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header {
     flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
+    align-items: flex-start;
   }
-  form input {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    transition: border-color 0.3s;
-  }
-  form input:focus {
-    outline: none;
-    border-color: #3498db;
-  }
-  
-  /* --- Modal --- */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    animation: fadeIn 0.3s ease-out;
-    z-index: 1000;
-  }
-  
-  .modal {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    max-width: 400px;
-    width: 100%;
-    animation: slideIn 0.4s ease-out;
-  }
-  
-  /* --- Animations --- */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  @keyframes slideIn {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  
-  /* --- Dashboard --- */
   .dashboard-container {
-    max-width: 960px;
-    margin: 20px auto;
-    padding: 0 20px;
+    padding: 1rem;
   }
-  
-  .dashboard-container h3 {
-    margin-top: 20px;
-  }
-  
-  /* --- Conteneur de la carte --- */
-  .map-container {
-    height: 400px;
+  button {
     width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
-  
-  /* --- Liste des géocaches --- */
-  .geocache-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .geocache-list li {
-    background-color: #fff;
-    padding: 10px;
-    margin-bottom: 8px;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-  }
-  .geocache-list li:hover {
-    transform: scale(1.02);
-  }
+}
+

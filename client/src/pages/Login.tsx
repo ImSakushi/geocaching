@@ -1,7 +1,9 @@
-// src/pages/Login.tsx
+// client/src/pages/Login.tsx
 import React, { useState } from 'react';
 import API from '../api';
 import { useNavigate, Link } from 'react-router-dom';
+import Cookies from 'js-cookie'; // Import de js-cookie
+
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -13,8 +15,10 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       const res = await API.post('/auth/login', { email, password });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('userEmail', email);
+      // Stocker le token et éventuellement l'email dans des cookies
+      Cookies.set('token', res.data.token, { expires: 1 });
+      Cookies.set('userEmail', email, { expires: 1 });
+      Cookies.set('userId', res.data.userId, { expires: 1 });
       navigate('/');
     } catch (err: any) {
       console.error(err);
@@ -23,33 +27,51 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="dashboard-container" style={{ maxWidth: '400px', marginTop: '50px' }}>
-      <h2>Connexion</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Email : </label>
+    <div className="dashboard-container" style={{ 
+      maxWidth: '400px',
+      minHeight: '100vh',
+      margin: '0 auto',
+      display: 'flex', 
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
+      padding: '2rem'
+    }}>
+      <h1 style={{ 
+        marginBottom: '2rem',
+        position: 'absolute',
+        top: '2rem',
+        left: '50%',
+        transform: 'translateX(-50%)'
+      }}>Connexion</h1>
+      {error && <p style={{ color: 'red', marginBottom: '1.5rem' }}>{error}</p>}
+      <form onSubmit={handleLogin} style={{ width: '100%', marginTop: '3rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <label style={{ marginBottom: '0.5rem', display: 'block' }}>Email : </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            style={{ width: '100%' }}
           />
         </div>
-        <div>
-          <label>Mot de passe : </label>
+        <div style={{ marginBottom: '2rem' }}>
+          <label style={{ marginBottom: '0.5rem', display: 'block' }}>Mot de passe : </label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            style={{ width: '100%' }}
           />
         </div>
-        <div style={{ marginTop: '10px' }}>
-          <button type="submit">Se connecter</button>
+        <div>
+          <button type="submit" style={{ width: '100%' }}>Se connecter</button>
         </div>
       </form>
-      <p>
+      <p style={{ marginTop: '2rem' }}>
         Pas encore inscrit ? <Link to="/register">S'inscrire</Link>
       </p>
     </div>

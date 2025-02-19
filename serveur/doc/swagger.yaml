@@ -3,15 +3,15 @@ info:
   title: GeoCaching API
   version: "1.0.0"
   description: API pour l'application GeoCaching
-
 servers:
   - url: http://localhost:5001/api
     description: Serveur local
-
 paths:
   /auth/register:
     post:
       summary: Inscription d'un nouvel utilisateur
+      tags:
+        - Auth
       requestBody:
         required: true
         content:
@@ -29,8 +29,8 @@ paths:
                   type: string
                   example: "password123"
       responses:
-        '200':
-          description: Inscription réussie, renvoie le token JWT
+        '201':
+          description: Inscription réussie, renvoie le token JWT et informations utilisateur
           content:
             application/json:
               schema:
@@ -38,12 +38,24 @@ paths:
                 properties:
                   token:
                     type: string
-        '400':
-          description: Erreur (par exemple, utilisateur déjà existant)
-
+                  userId:
+                    type: string
+                  avatar:
+                    type: string
+        '401':
+          description: Utilisateur déjà existant
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
   /auth/login:
     post:
       summary: Connexion d'un utilisateur existant
+      tags:
+        - Auth
       requestBody:
         required: true
         content:
@@ -61,8 +73,8 @@ paths:
                   type: string
                   example: "password123"
       responses:
-        '200':
-          description: Connexion réussie, renvoie le token JWT
+        '201':
+          description: Connexion réussie, renvoie le token JWT et informations utilisateur
           content:
             application/json:
               schema:
@@ -70,12 +82,25 @@ paths:
                 properties:
                   token:
                     type: string
-        '400':
+                  userId:
+                    type: string
+                  avatar:
+                    type: string
+        '401':
           description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
 
   /geocache:
     get:
       summary: Récupérer toutes les géocaches (filtrable par proximité)
+      tags:
+        - Geocache
       parameters:
         - in: query
           name: lat
@@ -105,9 +130,10 @@ paths:
                   $ref: '#/components/schemas/Geocache'
         '401':
           description: Non autorisé
-
     post:
       summary: Créer une nouvelle géocache
+      tags:
+        - Geocache
       security:
         - bearerAuth: []
       requestBody:
@@ -138,6 +164,9 @@ paths:
                 description:
                   type: string
                   example: "Cache dans le centre de Paris"
+                password:
+                  type: string
+                  example: "secret123"
       responses:
         '200':
           description: Géocache créée avec succès
@@ -156,7 +185,9 @@ paths:
         schema:
           type: string
     put:
-      summary: Modifier une géocache (uniquement par le créateur)
+      summary: Modifier une géocache (uniquement par le créateur ou un admin)
+      tags:
+        - Geocache
       security:
         - bearerAuth: []
       requestBody:
@@ -165,15 +196,9 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - gpsCoordinates
-                - difficulty
               properties:
                 gpsCoordinates:
                   type: object
-                  required:
-                    - lat
-                    - lng
                   properties:
                     lat:
                       type: number
@@ -191,24 +216,76 @@ paths:
               schema:
                 $ref: '#/components/schemas/Geocache'
         '401':
-          description: Non autorisé (l'utilisateur n'est pas le créateur)
+          description: Non autorisé
         '404':
           description: Géocache non trouvée
     delete:
-      summary: Supprimer une géocache (uniquement par le créateur)
+      summary: Supprimer une géocache (uniquement par le créateur ou un admin)
+      tags:
+        - Geocache
       security:
         - bearerAuth: []
       responses:
         '200':
           description: Géocache supprimée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
         '401':
           description: Non autorisé
+        '404':
+          description: Géocache non trouvée
+
+  /geocache/{id}/found:
+    post:
+      summary: Marquer une géocache comme trouvée (vérifie le mot de passe si nécessaire)
+      tags:
+        - Geocache
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Le mot de passe est requis uniquement si la géocache est protégée
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: "secret123"
+      responses:
+        '200':
+          description: Géocache marquée comme trouvée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  found:
+                    type: boolean
+        '401':
+          description: Mot de passe incorrect ou accès non autorisé
         '404':
           description: Géocache non trouvée
 
   /geocache/{id}/comment:
     post:
       summary: Ajouter un commentaire à une géocache
+      tags:
+        - Geocache
       security:
         - bearerAuth: []
       parameters:
@@ -239,6 +316,391 @@ paths:
         '404':
           description: Géocache non trouvée
 
+  /geocache/{id}/like:
+    post:
+      summary: Liker ou déliker une géocache
+      tags:
+        - Geocache
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Nombre de likes mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  likesCount:
+                    type: number
+        '404':
+          description: Géocache non trouvée
+
+  /geocache/{id}/comment/{commentId}/like:
+    post:
+      summary: Liker ou déliker un commentaire sur une géocache
+      tags:
+        - Geocache
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Nombre de likes du commentaire mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  likesCount:
+                    type: number
+        '404':
+          description: Géocache ou commentaire non trouvé
+
+  /geocache/{id}/comment/{commentId}:
+    put:
+      summary: Modifier un commentaire (uniquement par l'auteur ou un admin)
+      tags:
+        - Geocache
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: "Commentaire modifié"
+      responses:
+        '200':
+          description: Commentaire mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  comment:
+                    $ref: '#/components/schemas/Comment'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Géocache ou commentaire non trouvé
+    delete:
+      summary: Supprimer un commentaire (uniquement par l'auteur ou un admin)
+      tags:
+        - Geocache
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Commentaire supprimé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '401':
+          description: Non autorisé
+        '404':
+          description: Géocache ou commentaire non trouvé
+
+  /admin/users:
+    get:
+      summary: Récupérer la liste de tous les utilisateurs (sans mot de passe)
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des utilisateurs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Accès refusé
+  /admin/users/{id}:
+    put:
+      summary: Mettre à jour le mot de passe d'un utilisateur
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+              properties:
+                newPassword:
+                  type: string
+                  example: "nouveauPassword123"
+      responses:
+        '200':
+          description: Mot de passe mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '400':
+          description: Nouveau mot de passe requis
+        '404':
+          description: Utilisateur non trouvé
+    delete:
+      summary: Supprimer un utilisateur
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Utilisateur supprimé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '404':
+          description: Utilisateur non trouvé
+  /admin/users/{id}/admin:
+    put:
+      summary: Basculer le statut admin d'un utilisateur
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isAdmin:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Statut admin mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '404':
+          description: Utilisateur non trouvé
+
+  /rankings/best-customers:
+    get:
+      summary: Afficher le classement des meilleurs clients (par nombre de caches trouvées)
+      tags:
+        - Rankings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des meilleurs clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user:
+                      $ref: '#/components/schemas/User'
+                    finds:
+                      type: number
+        '401':
+          description: Non autorisé
+
+  /rankings/popular-caches:
+    get:
+      summary: Afficher le classement des caches les plus populaires (par nombre de likes)
+      tags:
+        - Rankings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des caches populaires
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Geocache'
+        '401':
+          description: Non autorisé
+
+  /rankings/rarely-found-caches:
+    get:
+      summary: Afficher le classement des caches les moins trouvées
+      tags:
+        - Rankings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des caches rarement trouvées
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Geocache'
+        '401':
+          description: Non autorisé
+
+  /upload/avatar:
+    put:
+      summary: Mettre à jour l'avatar d'un utilisateur
+      tags:
+        - Upload
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Avatar mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  avatar:
+                    type: string
+        '400':
+          description: Aucun fichier envoyé
+  /upload/geocache/{id}/photo:
+    post:
+      summary: Ajouter une photo à une géocache
+      tags:
+        - Upload
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Photo ajoutée avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  photos:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Aucun fichier envoyé
+        '404':
+          description: Géocache non trouvée
+
 components:
   securitySchemes:
     bearerAuth:
@@ -259,21 +721,66 @@ components:
             lng:
               type: number
         creator:
-          type: string
-          description: Identifiant de l'utilisateur créateur (habituellement l'ID)
+          type: object
+          properties:
+            _id:
+              type: string
+            email:
+              type: string
         difficulty:
           type: number
         description:
           type: string
+        password:
+          type: string
+          description: "Mot de passe pour protéger la géocache (peut être vide)"
         comments:
           type: array
           items:
-            type: object
-            properties:
-              user:
-                type: string
-              text:
-                type: string
-              date:
-                type: string
-                format: date-time
+            $ref: '#/components/schemas/Comment'
+        likes:
+          type: array
+          items:
+            type: string
+        foundBy:
+          type: array
+          items:
+            type: string
+        photos:
+          type: array
+          items:
+            type: string
+    Comment:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          type: object
+          properties:
+            _id:
+              type: string
+            email:
+              type: string
+            avatar:
+              type: string
+        text:
+          type: string
+        date:
+          type: string
+          format: date-time
+        likes:
+          type: array
+          items:
+            type: string
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        email:
+          type: string
+        isAdmin:
+          type: boolean
+        avatar:
+          type: string

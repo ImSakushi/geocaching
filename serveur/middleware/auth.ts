@@ -8,7 +8,7 @@ interface AuthRequest extends Request {
 }
 
 const auth = (req: AuthRequest, res: Response, next: NextFunction) => {
-  // Le token doit être dans le header Authorization sous la forme "Bearer <token>"
+  // Le token doit être dans le header "Bearer <token>"
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -19,7 +19,7 @@ const auth = (req: AuthRequest, res: Response, next: NextFunction) => {
   
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    req.user = decoded.user; // Assurez-vous que le payload est bien formé
+    req.user = decoded.user; 
     next();
   } catch (err) {
     res.status(401).json({ msg: 'Token invalide' });

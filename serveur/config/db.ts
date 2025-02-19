@@ -1,4 +1,3 @@
-// config/db.ts
 import mongoose from 'mongoose';
 
 const connectDB = async () => {
